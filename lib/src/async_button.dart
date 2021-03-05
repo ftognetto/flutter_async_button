@@ -13,47 +13,47 @@ class AsyncButton extends StatefulWidget {
   final AsyncButtonType type;
 
   /// In case of IconButton
-  final Widget icon;
+  final Widget? icon;
 
   /// In case of IconButton. If null [CenterLoading] is rendered
-  final Widget busyIcon;
+  final Widget? busyIcon;
 
   /// The text of the button
-  final Text text;
+  final Text? text;
 
   /// The color of the button
   final Color color;
 
   /// The color of the loading circle while button is busy
-  final Color loadingColor;
+  final Color? loadingColor;
 
   /// The border radius of the button
-  final BorderRadius borderRadius;
+  final BorderRadius? borderRadius;
 
-  final Future<void> Function() onPressed;
+  final Future<void> Function()? onPressed;
 
-  const AsyncButton.icon({ @required this.icon, this.busyIcon, this.onPressed, this.color = Colors.grey, this.loadingColor, Key key}) : 
+  const AsyncButton.icon({ required this.icon, this.busyIcon, this.onPressed, this.color = Colors.grey, this.loadingColor, Key? key}) : 
     type = AsyncButtonType.ICON,
     text = null,
     borderRadius = null,
     assert(icon != null),
     super(key: key);
 
-  const AsyncButton.raisedButton({@required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, Key key}):
+  const AsyncButton.raisedButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, Key? key}):
     type = AsyncButtonType.RAISED,
     icon = null,
     busyIcon = null,
     assert(text != null),
     super(key: key);
 
-  const AsyncButton.outlineButton({@required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, Key key}):
+  const AsyncButton.outlineButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, Key? key}):
     type = AsyncButtonType.OUTLINE,
     icon = null,
     busyIcon = null,
     assert(text != null),
     super(key: key);
   
-  const AsyncButton.flatButton({@required this.text, this.onPressed, this.color = Colors.grey, this.loadingColor, Key key}):
+  const AsyncButton.flatButton({required this.text, this.onPressed, this.color = Colors.grey, this.loadingColor, Key? key}):
     type = AsyncButtonType.FLAT,
     icon = null,
     busyIcon = null,
@@ -75,38 +75,41 @@ class _AsyncButtonState extends State<AsyncButton> {
     switch (widget.type) {
       case AsyncButtonType.ICON:
         return IconButton(
-          icon: _busy ? (widget.busyIcon ?? _Loading(color: widget.color)) : widget.icon,
+          icon: _busy ? (widget.busyIcon ?? _Loading(color: widget.color)) : widget.icon!,
           onPressed: _onPressed
         );
       case AsyncButtonType.RAISED:
-        return RaisedButton(
+        return ElevatedButton(
           child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text,
-          shape: widget.borderRadius != null ? RoundedRectangleBorder(borderRadius: widget.borderRadius) : RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          color: widget.color,
+          style: ElevatedButton.styleFrom(
+            shape: widget.borderRadius != null ? RoundedRectangleBorder(borderRadius: widget.borderRadius!) : RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            primary: widget.color
+          ),
           onPressed: _onPressed
         );
       case AsyncButtonType.FLAT:
-        return FlatButton(
-          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text,
-          textColor: widget.color,
+        return TextButton(
+          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text!,
+          style: TextButton.styleFrom(textStyle: TextStyle(color: widget.color)),
           onPressed: _onPressed
         );
       case AsyncButtonType.OUTLINE:
-        return OutlineButton(
-          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text,
-          textColor: widget.color,
-          color: widget.color,
+        return OutlinedButton(
+          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text!,
+          style: OutlinedButton.styleFrom(
+            //backgroundColor: widget.color,
+            textStyle: TextStyle(color: widget.color)
+          ),
           onPressed: _onPressed
         );
     }
-    return Container();
   }
 
   void _onPressed() {
     if (widget.onPressed == null) return;
     if (_busy) return;
     setState(() { _busy = true; });
-    widget.onPressed().whenComplete((){
+    widget.onPressed!().whenComplete((){
       setState(() { _busy = false; });
     });    
   }
@@ -114,9 +117,9 @@ class _AsyncButtonState extends State<AsyncButton> {
 
 class _Loading extends StatelessWidget {
 
-  final Color color;
+  final Color? color;
 
-  const _Loading({Key key, this.color }) : super(key: key);
+  const _Loading({Key? key, this.color }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
