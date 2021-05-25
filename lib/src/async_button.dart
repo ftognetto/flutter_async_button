@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 enum AsyncButtonType {
   ICON,
-  RAISED,
-  FLAT,
+  ELEVATED,
+  TEXT,
   OUTLINE
 }
 
@@ -27,37 +27,46 @@ class AsyncButton extends StatefulWidget {
   /// The color of the loading circle while button is busy
   final Color? loadingColor;
 
+  /// The color of the background while button is busy
+  final Color? loadingBackgroundColor;
+
   /// The border radius of the button
   final BorderRadius? borderRadius;
 
+  /// The elevation of the elevated button
+  final double? elevation;
+
   final Future<void> Function()? onPressed;
 
-  const AsyncButton.icon({ required this.icon, this.busyIcon, this.onPressed, this.color = Colors.grey, this.loadingColor, Key? key}) : 
+  const AsyncButton.icon({ required this.icon, this.busyIcon, this.onPressed, this.color = Colors.grey, this.loadingColor, this.loadingBackgroundColor = Colors.grey, Key? key}) : 
     type = AsyncButtonType.ICON,
     text = null,
     borderRadius = null,
+    elevation = 0,
     assert(icon != null),
     super(key: key);
 
-  const AsyncButton.raisedButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, Key? key}):
-    type = AsyncButtonType.RAISED,
+  const AsyncButton.elevatedButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, this.loadingBackgroundColor = Colors.grey, this.elevation, Key? key}):
+    type = AsyncButtonType.ELEVATED,
     icon = null,
     busyIcon = null,
     assert(text != null),
     super(key: key);
 
-  const AsyncButton.outlineButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, Key? key}):
+  const AsyncButton.outlineButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, this.loadingBackgroundColor = Colors.grey, Key? key}):
     type = AsyncButtonType.OUTLINE,
     icon = null,
     busyIcon = null,
+    elevation = 0,
     assert(text != null),
     super(key: key);
   
-  const AsyncButton.flatButton({required this.text, this.onPressed, this.color = Colors.grey, this.loadingColor, Key? key}):
-    type = AsyncButtonType.FLAT,
+  const AsyncButton.textButton({required this.text, this.onPressed, this.color = Colors.grey, this.loadingColor, this.loadingBackgroundColor = Colors.grey, Key? key}):
+    type = AsyncButtonType.TEXT,
     icon = null,
     busyIcon = null,
     borderRadius = null,
+    elevation = 0,
     assert(text != null),
     super(key: key);
 
@@ -78,16 +87,17 @@ class _AsyncButtonState extends State<AsyncButton> {
           icon: _busy ? (widget.busyIcon ?? _Loading(color: widget.color)) : widget.icon!,
           onPressed: _onPressed
         );
-      case AsyncButtonType.RAISED:
+      case AsyncButtonType.ELEVATED:
         return ElevatedButton(
-          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text,
+          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color) : widget.text,
           style: ElevatedButton.styleFrom(
             shape: widget.borderRadius != null ? RoundedRectangleBorder(borderRadius: widget.borderRadius!) : RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            primary: widget.color
+            primary: _busy ? widget.loadingBackgroundColor : widget.color,
+            elevation: widget.elevation ?? 2
           ),
           onPressed: _onPressed
         );
-      case AsyncButtonType.FLAT:
+      case AsyncButtonType.TEXT:
         return TextButton(
           child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text!,
           style: TextButton.styleFrom(textStyle: TextStyle(color: widget.color)),
