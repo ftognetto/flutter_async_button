@@ -36,9 +36,11 @@ class AsyncButton extends StatefulWidget {
   /// The elevation of the elevated button
   final double? elevation;
 
+  final bool Function()? busyBuilder;
+
   final Future<void> Function()? onPressed;
 
-  const AsyncButton.icon({ required this.icon, this.busyIcon, this.onPressed, this.color = Colors.grey, this.loadingColor, this.loadingBackgroundColor = Colors.grey, Key? key}) : 
+  const AsyncButton.icon({ required this.icon, this.busyIcon, this.onPressed, this.color = Colors.grey, this.loadingColor, this.loadingBackgroundColor = Colors.grey, this.busyBuilder, Key? key}) : 
     type = AsyncButtonType.ICON,
     text = null,
     borderRadius = null,
@@ -46,14 +48,14 @@ class AsyncButton extends StatefulWidget {
     assert(icon != null),
     super(key: key);
 
-  const AsyncButton.elevatedButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, this.loadingBackgroundColor = Colors.grey, this.elevation, Key? key}):
+  const AsyncButton.elevatedButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, this.loadingBackgroundColor = Colors.grey, this.elevation, this.busyBuilder, Key? key}):
     type = AsyncButtonType.ELEVATED,
     icon = null,
     busyIcon = null,
     assert(text != null),
     super(key: key);
 
-  const AsyncButton.outlineButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, this.loadingBackgroundColor = Colors.grey, Key? key}):
+  const AsyncButton.outlineButton({required this.text, this.onPressed, this.color = Colors.grey, this.borderRadius = BorderRadius.zero, this.loadingColor, this.loadingBackgroundColor = Colors.grey, this.busyBuilder, Key? key}):
     type = AsyncButtonType.OUTLINE,
     icon = null,
     busyIcon = null,
@@ -61,7 +63,7 @@ class AsyncButton extends StatefulWidget {
     assert(text != null),
     super(key: key);
   
-  const AsyncButton.textButton({required this.text, this.onPressed, this.color = Colors.grey, this.loadingColor, this.loadingBackgroundColor = Colors.grey, Key? key}):
+  const AsyncButton.textButton({required this.text, this.onPressed, this.color = Colors.grey, this.loadingColor, this.loadingBackgroundColor = Colors.grey, this.busyBuilder, Key? key}):
     type = AsyncButtonType.TEXT,
     icon = null,
     busyIcon = null,
@@ -76,10 +78,12 @@ class AsyncButton extends StatefulWidget {
 
 class _AsyncButtonState extends State<AsyncButton> {
 
-  bool _busy = false;
+  bool busy = false;
 
   @override
   Widget build(BuildContext context) {
+
+    final _busy = (widget.busyBuilder != null) ? widget.busyBuilder!() : busy;
 
     switch (widget.type) {
       case AsyncButtonType.ICON:
@@ -117,10 +121,10 @@ class _AsyncButtonState extends State<AsyncButton> {
 
   void _onPressed() {
     if (widget.onPressed == null) return;
-    if (_busy) return;
-    setState(() { _busy = true; });
+    if (busy) return;
+    setState(() { busy = true; });
     widget.onPressed!().whenComplete((){
-      setState(() { _busy = false; });
+      setState(() { busy = false; });
     });    
   }
 }

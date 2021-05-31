@@ -1,6 +1,6 @@
 name: flutter_async_button
 description: A useful wrapper for Flutter buttons to support async operations
-version: 1.0.1
+version: 1.0.2
 homepage: https://Www.quantos.it
 
 environment:

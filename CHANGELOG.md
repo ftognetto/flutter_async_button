@@ -9,3 +9,8 @@
 ## [1.0.1] - 2021-03-05
 
 * Added background loading color to elevated button
+
+
+## [1.0.1] - 2021-03-05
+
+* Added busy builder
