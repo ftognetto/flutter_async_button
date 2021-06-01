@@ -36,7 +36,7 @@ class AsyncButton extends StatefulWidget {
   /// The elevation of the elevated button
   final double? elevation;
 
-  final bool Function()? busyBuilder;
+  final AsyncStatus Function()? busyBuilder;
 
   final Future<void> Function()? onPressed;
 
@@ -76,40 +76,42 @@ class AsyncButton extends StatefulWidget {
   _AsyncButtonState createState() => _AsyncButtonState();
 }
 
+enum AsyncStatus { IDLE, BUSY, SUCCESS, FAILURE }
+
 class _AsyncButtonState extends State<AsyncButton> {
 
-  bool busy = false;
+  AsyncStatus _status = AsyncStatus.IDLE;
 
   @override
   Widget build(BuildContext context) {
 
-    final _busy = (widget.busyBuilder != null) ? widget.busyBuilder!() : busy;
+    final status = (widget.busyBuilder != null) ? widget.busyBuilder!() : _status;
 
     switch (widget.type) {
       case AsyncButtonType.ICON:
         return IconButton(
-          icon: _busy ? (widget.busyIcon ?? _Loading(color: widget.color)) : widget.icon!,
+          icon: _buttonChild(status),
           onPressed: _onPressed
         );
       case AsyncButtonType.ELEVATED:
         return ElevatedButton(
-          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color) : widget.text,
+          child: _buttonChild(status),
           style: ElevatedButton.styleFrom(
             shape: widget.borderRadius != null ? RoundedRectangleBorder(borderRadius: widget.borderRadius!) : RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            primary: _busy ? widget.loadingBackgroundColor : widget.color,
+            primary: _status == AsyncStatus.IDLE ? widget.color : widget.loadingBackgroundColor,
             elevation: widget.elevation ?? 2
           ),
           onPressed: _onPressed
         );
       case AsyncButtonType.TEXT:
         return TextButton(
-          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text!,
+          child: _buttonChild(status),
           style: TextButton.styleFrom(textStyle: TextStyle(color: widget.color)),
           onPressed: _onPressed
         );
       case AsyncButtonType.OUTLINE:
         return OutlinedButton(
-          child: _busy ? _Loading(color: widget.loadingColor ?? widget.color,) : widget.text!,
+          child: _buttonChild(status),
           style: OutlinedButton.styleFrom(
             //backgroundColor: widget.color,
             textStyle: TextStyle(color: widget.color)
@@ -119,15 +121,29 @@ class _AsyncButtonState extends State<AsyncButton> {
     }
   }
 
+  Widget _buttonChild(AsyncStatus status) {
+    switch (status) {
+      case AsyncStatus.BUSY: return _Loading(color: widget.loadingColor ?? widget.color,);
+      case AsyncStatus.SUCCESS: return _Success(color: widget.loadingColor ?? widget.color);
+      case AsyncStatus.FAILURE: return _Failure(color: widget.loadingColor ?? widget.color);
+      case AsyncStatus.IDLE: return widget.text!;
+    }
+  }
+
   void _onPressed() {
     if (widget.onPressed == null) return;
-    if (busy) return;
-    setState(() { busy = true; });
-    widget.onPressed!().whenComplete((){
-      setState(() { busy = false; });
-    });    
+    if (_status != AsyncStatus.IDLE) return;
+    setState(() { _status = AsyncStatus.BUSY; });
+    widget.onPressed!().then((_){
+      setState((){ _status = AsyncStatus.SUCCESS; });
+    }).catchError((_){
+      setState(() { _status = AsyncStatus.FAILURE; });
+    }).whenComplete(() {
+      Future.delayed(Duration(seconds: 2), () { setState((){ _status = AsyncStatus.IDLE; }); }) ;
+    }); 
   }
 }
+
 
 class _Loading extends StatelessWidget {
 
@@ -153,5 +169,53 @@ class _Loading extends StatelessWidget {
       child: loading
     );
     return loading;
+  }
+}
+
+class _Success extends StatelessWidget {
+
+  final Color? color;
+
+  const _Success({Key? key, this.color }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _color = color ?? Theme.of(context).accentColor;
+    // Widget loading = SizedBox(
+    //   width: 33,
+    //   height: 33,
+    //   child: Padding(
+    //     padding: EdgeInsets.all(8),
+    //     child: Icon(Icons.check, color: _color)
+    //   )
+    // );
+    // loading = Center(
+    //   child: loading
+    // );
+    return Icon(Icons.check, color: _color);
+  }
+}
+
+class _Failure extends StatelessWidget {
+
+  final Color? color;
+
+  const _Failure({Key? key, this.color }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _color = color ?? Theme.of(context).accentColor;
+    // Widget loading = SizedBox(
+    //   width: 33,
+    //   height: 33,
+    //   child: Padding(
+    //     padding: EdgeInsets.all(8),
+    //     child: Icon(Icons.close, color: _color)
+    //   )
+    // );
+    // loading = Center(
+    //   child: loading
+    // );
+    return Icon(Icons.close, color: _color);
   }
 }

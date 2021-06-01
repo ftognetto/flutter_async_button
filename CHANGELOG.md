@@ -11,6 +11,10 @@
 * Added background loading color to elevated button
 
 
-## [1.0.1] - 2021-03-05
+## [1.0.2] - 2021-03-05
 
 * Added busy builder
+
+## [1.0.1] - 2021-03-05
+
+* Added async state
