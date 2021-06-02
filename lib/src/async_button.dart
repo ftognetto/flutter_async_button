@@ -98,7 +98,7 @@ class _AsyncButtonState extends State<AsyncButton> {
           child: _buttonChild(status),
           style: ElevatedButton.styleFrom(
             shape: widget.borderRadius != null ? RoundedRectangleBorder(borderRadius: widget.borderRadius!) : RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            primary: _status == AsyncStatus.IDLE ? widget.color : widget.loadingBackgroundColor,
+            primary: status == AsyncStatus.IDLE ? widget.color : widget.loadingBackgroundColor,
             elevation: widget.elevation ?? 2
           ),
           onPressed: _onPressed
@@ -181,17 +181,6 @@ class _Success extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _color = color ?? Theme.of(context).accentColor;
-    // Widget loading = SizedBox(
-    //   width: 33,
-    //   height: 33,
-    //   child: Padding(
-    //     padding: EdgeInsets.all(8),
-    //     child: Icon(Icons.check, color: _color)
-    //   )
-    // );
-    // loading = Center(
-    //   child: loading
-    // );
     return Icon(Icons.check, color: _color);
   }
 }
@@ -205,17 +194,6 @@ class _Failure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _color = color ?? Theme.of(context).accentColor;
-    // Widget loading = SizedBox(
-    //   width: 33,
-    //   height: 33,
-    //   child: Padding(
-    //     padding: EdgeInsets.all(8),
-    //     child: Icon(Icons.close, color: _color)
-    //   )
-    // );
-    // loading = Center(
-    //   child: loading
-    // );
     return Icon(Icons.close, color: _color);
   }
 }
