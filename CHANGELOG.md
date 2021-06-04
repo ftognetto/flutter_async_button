@@ -21,3 +21,7 @@
 ## [1.0.4] - 2021-06-02
 
 * Added async state
+
+## [1.0.5] - 2021-06-02
+
+* Check if mounted before setState

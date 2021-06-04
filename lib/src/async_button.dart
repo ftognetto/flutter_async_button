@@ -135,11 +135,11 @@ class _AsyncButtonState extends State<AsyncButton> {
     if (_status != AsyncStatus.IDLE) return;
     setState(() { _status = AsyncStatus.BUSY; });
     widget.onPressed!().then((_){
-      setState((){ _status = AsyncStatus.SUCCESS; });
+      if (mounted) { setState((){ _status = AsyncStatus.SUCCESS; }); }
     }).catchError((_){
-      setState(() { _status = AsyncStatus.FAILURE; });
+      if (mounted) { setState(() { _status = AsyncStatus.FAILURE; }); }
     }).whenComplete(() {
-      Future.delayed(Duration(seconds: 2), () { setState((){ _status = AsyncStatus.IDLE; }); }) ;
+      Future.delayed(Duration(seconds: 2), () { if (mounted) { setState((){ _status = AsyncStatus.IDLE; }); } }) ;
     }); 
   }
 }
