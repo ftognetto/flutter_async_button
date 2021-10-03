@@ -126,7 +126,7 @@ class _AsyncButtonState extends State<AsyncButton> {
       case AsyncStatus.BUSY: return _Loading(color: widget.loadingColor ?? widget.color,);
       case AsyncStatus.SUCCESS: return _Success(color: widget.loadingColor ?? widget.color);
       case AsyncStatus.FAILURE: return _Failure(color: widget.loadingColor ?? widget.color);
-      case AsyncStatus.IDLE: return widget.text!;
+      case AsyncStatus.IDLE: return widget.type == AsyncButtonType.ICON ? widget.icon! : widget.text!;
     }
   }
 

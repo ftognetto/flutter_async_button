@@ -25,3 +25,7 @@
 ## [1.0.5] - 2021-06-02
 
 * Check if mounted before setState
+
+## [1.0.6] - 2021-06-02
+
+* Async icon button bug
