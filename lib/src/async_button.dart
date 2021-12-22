@@ -84,7 +84,7 @@ class _AsyncButtonState extends State<AsyncButton> {
       case AsyncButtonType.icon:
         return IconButton(
           icon: widget.childBuilder != null ? widget.childBuilder!(_status) : _iconButtonChild(_status),
-          onPressed: _onPressed
+          onPressed: widget.onPressed == null ? null : _onPressed // importante - serve per dare lo stile disabled automaticamente se onpressed è null
         );
       case AsyncButtonType.elevated:
         var style = widget.style ?? ElevatedButton.styleFrom();
@@ -92,26 +92,26 @@ class _AsyncButtonState extends State<AsyncButton> {
         return ElevatedButton(
           child: widget.childBuilder != null ? widget.childBuilder!(_status) : _elevatedButtonChild(_status),
           style: style,
-          onPressed: _onPressed
+          onPressed: widget.onPressed == null ? null : _onPressed
         );
       case AsyncButtonType.text:
         return TextButton(
           child: widget.childBuilder != null ? widget.childBuilder!(_status) : _textButtonChild(_status),
           style: widget.style ?? TextButton.styleFrom(),
-          onPressed: _onPressed
+          onPressed: widget.onPressed == null ? null : _onPressed
         );
       case AsyncButtonType.textIcon:
         return TextButton.icon(
           label: widget.label!,
           icon: widget.childBuilder != null ? widget.childBuilder!(_status) : _iconButtonChild(_status),
           style: widget.style ?? TextButton.styleFrom(),
-          onPressed: _onPressed
+          onPressed: widget.onPressed == null ? null : _onPressed
         );
       case AsyncButtonType.outlined:
         return OutlinedButton(
           child: widget.childBuilder != null ? widget.childBuilder!(_status) : _outlinedButtonChild(_status),
           style: widget.style ?? OutlinedButton.styleFrom(),
-          onPressed: _onPressed
+          onPressed: widget.onPressed == null ? null : _onPressed
         );
     }
   }
@@ -153,7 +153,6 @@ class _AsyncButtonState extends State<AsyncButton> {
   }
 
   void _onPressed() {
-    if (widget.onPressed == null) return;
     if (_status != AsyncStatus.idle) return;
     setState(() { _status = AsyncStatus.busy; });
     widget.onPressed!().then((_){
